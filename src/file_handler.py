@@ -2,12 +2,13 @@ import os
 import csv
 import crypto
 
-path = "../appdata/test-info.csv"
+login_path = "../appdata/login.txt"
+data_path = "../appdata/data.enc"
 
 def verify_info(user, password):
-    if os.path.isfile(path):
-        print("The file exists!")
-        with open(path, 'r') as f:
+    if os.path.isfile(login_path) and os.path.isfile(data_path):
+        print("The files exist!")
+        with open(login_path, 'r') as f:
             line = f.readline()
             savedUser = line.strip()
             line = f.readline()
@@ -16,23 +17,21 @@ def verify_info(user, password):
             return True
 
     else:
-        with open(path, "x") as f:
+        with open(login_path, "x") as f:
             f.write(f"{user}\n")
             f.write(f"{password}\n")
+        with open(data_path, "x") as f:
+            f.write("")
         return True
 
-def get_info():
-    info = []
-    with open(path, 'r') as f:
-        f.readline()
-        f.readline()
-        csvFile = csv.reader(f)
-        for line in csvFile:
-            print(line)
-            info.append(line)
-    return info
+def get_info(password):
+    with open(data_path, 'rb') as f:
+        enc_info = f.read()
+    dec_info = crypto.decrypt_to_list_of_lists(enc_info, password)
+    return dec_info
+
 
 def add_info(service, user, password):
-    with open(path, 'a', newline='') as f:
+    with open(data_path, 'a', newline='') as f:
         writer = csv.writer(f)
         writer.writerow([service, user, password])

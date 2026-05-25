@@ -5,10 +5,13 @@ import hashlib
 import file_handler
 
 logged_in = False
+password = ""
 
 def login():
     user_input = userEntry.get()
+    global password
     pass_input = passEntry.get()
+    password = pass_input
     hashed_pass = hashlib.sha256(pass_input.encode())
     hex_pass = hashed_pass.hexdigest()
     #print(f"user name: {user_input}")
@@ -33,7 +36,7 @@ def showData():
     userLabel = canvas.create_text(300, 50, text="Username")
     passLabel = canvas.create_text(500, 50, text="Password")
     canvas.create_line(0, 75, 600, 75)
-    info = file_handler.get_info()
+    info = file_handler.get_info(password)
     i = 0
     j = 0
     for line in info:

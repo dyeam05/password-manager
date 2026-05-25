@@ -1,0 +1,3 @@
+- Add password delete function
+- keep refining UI looks
+- 
