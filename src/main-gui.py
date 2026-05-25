@@ -6,6 +6,7 @@ import file_handler
 
 logged_in = False
 password = ""
+info = []
 
 def login():
     user_input = userEntry.get()
@@ -36,6 +37,7 @@ def showData():
     userLabel = canvas.create_text(300, 50, text="Username")
     passLabel = canvas.create_text(500, 50, text="Password")
     canvas.create_line(0, 75, 600, 75)
+    global info
     info = file_handler.get_info(password)
     i = 0
     j = 0
@@ -46,7 +48,8 @@ def showData():
             canvas.create_text(100+i, 50+j, text=entry)
             i += 200
     addBtn.pack(pady=10)
-    logoutBtn.pack(pady=10)        
+    logoutBtn.pack(pady=10)
+    print(info)        
 
 def addData():
     new_pass_window.deiconify()
@@ -55,7 +58,8 @@ def submitData():
     newService = new_serviceEntry.get()
     newUser = new_userEntry.get()
     newPass = new_passEntry.get()
-    file_handler.add_info(newService, newUser, newPass)
+    info.append([newService, newUser, newPass])
+    file_handler.add_info(info, password)
     new_pass_window.withdraw()
     canvas.delete("all")
     showData()

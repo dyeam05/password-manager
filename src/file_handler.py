@@ -25,13 +25,19 @@ def verify_info(user, password):
         return True
 
 def get_info(password):
+    empty_info = []
     with open(data_path, 'rb') as f:
         enc_info = f.read()
-    dec_info = crypto.decrypt_to_list_of_lists(enc_info, password)
+    
+    if os.path.exists(data_path) and os.path.getsize(data_path) == 0:
+        dec_info = empty_info
+    else:
+        dec_info = crypto.decrypt_to_list_of_lists(enc_info, password)
     return dec_info
 
 
-def add_info(service, user, password):
-    with open(data_path, 'a', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow([service, user, password])
+def add_info(info, password):
+    enc_info = crypto.encrypt_list_of_lists(info, password)
+    with open(data_path, 'wb') as f:
+        f.write(enc_info)
+       
