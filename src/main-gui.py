@@ -8,6 +8,8 @@ logged_in = False
 password = ""
 info = []
 
+
+#Checks credentials for login authentication
 def login():
     user_input = userEntry.get()
     global password
@@ -22,6 +24,7 @@ def login():
     else:
         incorrectLogin.pack()
 
+#Clears login page and shows decrypted password information
 def showData():
     #clear login page
     userEntry.pack_forget()
@@ -31,6 +34,7 @@ def showData():
 
     #pack container and canvas
     canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    #scrollable_frame.pack()
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     canvas.configure(yscrollcommand=scrollbar.set)
 
@@ -58,9 +62,11 @@ def showData():
     addBtn.pack(pady=10)
     logoutBtn.pack(pady=10)
 
+#Opens dialog box to add password data
 def addData():
     new_pass_window.deiconify()
 
+#Submits password data to decrypted bytestream in memory
 def submitData():
     newService = new_serviceEntry.get()
     newUser = new_userEntry.get()
@@ -71,6 +77,7 @@ def submitData():
     canvas.delete("all")
     showData()
 
+#Removes password info and reopens login page
 def logout():
     #container_frame.pack_forget()
     scrollable_frame.pack_forget()
@@ -88,42 +95,63 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.title("Password Manager")
     root.geometry("750x750")
-    root.configure(bg='#181818')
+    root.configure(bg='#ffffff')
 
     #add title label
-    label = tk.Label(root, text="Secure Password Manager", bg='#181818')
+    label = tk.Label(root, text="Secure Password Manager", bg='#ffffff') #181818 color
     label.pack(pady=10)
 
     #Password manager login
     userEntry = tk.Entry(root, width=50)
     passEntry = tk.Entry(root, width=50, show="*")
-    submitBtn = tk.Button(root, text="Submit", bg='#181818', command=login)
-    incorrectLogin = tk.Label(root, text="Incorrect Password or Username", fg="red", bg='#181818')
+    submitBtn = tk.Button(root, text="Submit", bg='#ffffff', command=login)
+    incorrectLogin = tk.Label(root, text="Incorrect Password or Username", fg="red", bg='#ffffff')
     userEntry.pack(pady=10)
     passEntry.pack(pady=10)
     submitBtn.pack()
 
     #create canvas
-    canvas = tk.Canvas(root, width=600, height=600, bg="#212121")
+    canvas = tk.Canvas(root, width=600, height=600, bg='#f8f8f8')
 
-    #create inner frame and inner frame canvas for password info
+    #TODO: create scrollable frame class, remove this from main method.
+    #TODO: properly place and center scrollable_frame
+    #create scrollable frame
     scrollable_frame = tk.Frame(canvas)
-    info_canvas = tk.Canvas(scrollable_frame)
-    
+
+    canvas.create_window((0, 85), window=scrollable_frame, anchor=NW)
+
     #create scrollbar
-    scrollbar = tk.Scrollbar(scrollable_frame, orient=VERTICAL, command=info_canvas.yview)
-    info_canvas.configure(yscrollcommand=scrollbar.set)
+    scrollbar = tk.Scrollbar(scrollable_frame, orient=VERTICAL)
 
+    #create inner frame canvas
+    info_canvas = tk.Canvas(scrollable_frame, yscrollcommand=scrollbar.set)
 
-    #create window with scrollable_frame
-    canvas.create_window((0, 80), window=scrollable_frame, anchor="nw", width=600, height=520)
-    scrollable_frame.bind("<Configure>", lambda e:
-    canvas.configure(scrollregion=canvas.bbox("all")))
+    #configure scrollbar to inner canvas
+    scrollbar.config(command=info_canvas.yview)
+
+    #create frame in the interior of the inner canvas
+    scrollable_frame.interior = interior = tk.Frame(info_canvas)
+    interior_id = info_canvas.create_window(0, 0, window=interior, anchor=NW)
+
+    def _configure_interior(event):
+        #update scrollbars to match size of inner frame
+        size = (interior.winfo_reqwidth(), interior.winfo_regheight())
+        info_canvas.config(scrollregion="0 0 %s %s" % size)
+        if interior.winfo_reqwidth() != info_canvas.winfo_width():
+            #update the canvas's width to fit the inner frame.
+            canvas.config(width=interior.winfo_reqwidth())
+        interior.bind('<Configure>', _configure_interior)
+
+    def _configure_canvas(event):
+        if interior.winfo_reqwidth() != info_canvas.winfo_width():
+            #update the inner frame's width to fill the canvas
+            info_canvas.itemconfigure(interior_id, width=canvas.winfo_width())
+        canvas.bind('<Configure>', _configure_canvas)
 
 
     #add-password and logout buttons
-    addBtn = tk.Button(root, text="Add Password", bg='#181818', command=addData)
-    logoutBtn = tk.Button(root, text="Logout", bg='#181818', command=logout)
+    addBtn = tk.Button(root, text="Add Password", bg='#ffffff', command=addData)
+    logoutBtn = tk.Button(root, text="Logout", bg='#ffffff', command=logout)
 
     #add-password dialog window
     new_pass_window = tk.Toplevel(root)
@@ -139,7 +167,7 @@ if __name__ == "__main__":
     tk.Label(new_pass_window, text="Password:").pack()
     new_passEntry = tk.Entry(new_pass_window, width=50)
     new_passEntry.pack(pady=10)
-    submitInfoBtn = tk.Button(new_pass_window, text="Submit", bg='#181818', command=submitData).pack(pady=10)
+    submitInfoBtn = tk.Button(new_pass_window, text="Submit", bg='#ffffff', command=submitData).pack(pady=10)
     new_pass_window.withdraw()
 
     #run application
