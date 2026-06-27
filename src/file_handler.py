@@ -7,7 +7,6 @@ data_path = "../appdata/data.enc"
 
 def verify_info(user, password):
     if os.path.isfile(login_path) and os.path.isfile(data_path):
-        print("The files exist!")
         with open(login_path, 'r') as f:
             line = f.readline()
             savedUser = line.strip()
